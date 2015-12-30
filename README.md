@@ -4,6 +4,7 @@
 
 See the code below for an example of how to compress and decompress.
 
+```java
 	import java.io.IOException;
 	import java.nio.file.FileVisitResult;
 	import java.nio.file.Files;
@@ -104,4 +105,5 @@ See the code below for an example of how to compress and decompress.
 		    });
 		}
 	}
+```
 
