@@ -7,6 +7,8 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
@@ -18,6 +20,22 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  *
  */
 public class BZip2Compressor implements Compressor {
+
+	/* (non-Javadoc)
+	 * @see com.schneider.utils.compression.Compressor#compress(java.io.InputStream, java.io.OutputStream)
+	 */
+	@Override
+	public void compress(InputStream input, OutputStream output) throws IOException {
+		BZip2CompressorOutputStream gzOut = new BZip2CompressorOutputStream(output);
+		final byte[] buffer = new byte[16];
+		int n = 0;
+		while (-1 != (n = input.read(buffer))) {
+		    gzOut.write(buffer, 0, n);
+		}
+		gzOut.close();
+		output.close();
+		input.close();
+	}
 
 	/* (non-Javadoc)
 	 * @see com.schneider.utils.compression.Compressor#compressFile(java.nio.file.Path, java.nio.file.Path)
@@ -41,12 +59,26 @@ public class BZip2Compressor implements Compressor {
 	}
 
 	/* (non-Javadoc)
+	 * @see com.schneider.utils.compression.Compressor#decompresss(java.io.InputStream, java.io.OutputStream)
+	 */
+	@Override
+	public void decompresss(InputStream input, OutputStream output) throws IOException {
+		BZip2CompressorInputStream gzIn = new BZip2CompressorInputStream(input);
+		final byte[] buffer = new byte[16];
+		int n = 0;
+		while (-1 != (n = gzIn.read(buffer))) {
+			output.write(buffer, 0, n);
+		}
+		output.close();
+		gzIn.close();
+	}
+
+	/* (non-Javadoc)
 	 * @see com.schneider.utils.compression.Compressor#decompressFile(java.nio.file.Path, java.nio.file.Path)
 	 */
 	@Override
 	public void decompressFile(Path toDecompress, Path decompressed)
 			throws IOException {
-		
 		FileInputStream fin = new FileInputStream(toDecompress.toFile());
 		BufferedInputStream in = new BufferedInputStream(fin);
 		FileOutputStream out = new FileOutputStream(decompressed.toFile());
